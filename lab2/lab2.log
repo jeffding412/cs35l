@@ -1,0 +1,69 @@
+
+
+First, I check what the locale was using the 'locale' command. It said I was using 'en_US.UTF-8' locale, which is not the correct locale. I used the 'export LC_ALL='C'' to set the locale to standard C and after running the 'locale' command again, it said I was using the C locale, which was what I wanted and intended.
+
+Then, I created a sorted list of English words using the command 'sort /usr/share/dict/words > words' on the Linux server. This sorted a bunch of English words into a file called words.
+
+Then, I retrieved a text file containing the HTML in the assignment using some wget magic 'wget https://web.cs.ucla.edu/classes/spring18/cs35L/assign/assign2.html'. This pulled the assignment website's HTML into the remote server as a file called assign2.html.
+
+Then, I ran and tested the following commands with that text file being standard input and compared its output to the previous command:
+
+tr-c 'A-Za-z' '[\n*]' < assign2.html
+Outputted anything that had A-Z or a-z. Any line that didn't have these characters became an empty line. This is because I used the -c option, which takes the complement of the first set, the first set being any letter, and the complement being anything not a letter and replacing it with a new line character. 
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.html
+Outputted all things that the previous command outputted, but no blank lines except for one at the beginning. This is because of the addition of the -s option, which replaces a repeated sequence of the complement with only one occurence of the new line character.
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort
+Outputs all things that the previous command outputted, but in a sorted order by ASCII values. This is because we piped the previous command's output into the sort command, thus sorting the words.
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort -u
+Outputs all things that the previous command outputted, but with only one occurence of each word. This is because of the '-u' option, which tells the 'sort' command to sort by unique words, thus deleting duplicate characters.
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort -u | comm - words
+Reads from standard input and compares line by line with words. It outputs three columns of words. The first column is words unique to assign2.html. The second column is words unique to words. The third colum is words that are similar or could be similar in both. This is because we use the 'comm -' command, comparing the contents of the input and words.
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort -u | comm -23 - words
+Outputs the first column of the previous command. This is because we use the '-23' option, which basically disregard the 2nd and 3rd columns of the output. Therefore, only words that are unique to assign2.html are outputted.
+
+After running and testing these commands, I started working on the translation lab. First, I used a bit of wget magic to download the hawaiian to english website through the command 'wget http://mauimapp.com/moolelo/hwnwdseng.htm'. This created a hwnwdseng.htm file that holds the webpage.
+
+Then, I wrote a script called buildwords that reads the HTML from standard input and writes a sorted list of unique words to standard output.
+
+buildwords:
+#! /bin/sh
+
+# removes everything except words between <td> and </td>
+sed -n '/<td>/,/<\/td>/p' $1 |
+
+# removes new lines
+tr -d '\n' |
+
+# replaces ` with '
+sed s/\`/\'/g |
+
+# replaces </td> with new lines
+sed -r 's/<\/td>/\n/g' |
+
+# removes all tags
+sed -r 's/<[^>]*>//g' |
+
+# removes English words( which are every other word)
+sed -n '2~2p' |
+
+# replaces commas and spaces with new lines
+sed -r 's/[, ]/\n/g' |
+
+# removes empty lines
+sed -r '/^\s*$/d' |
+
+# changes uppercase letters to lowercase letters
+tr '[:upper:]' '[:lower:]' |
+
+# removes words that don't have Hawaiian letters
+sed  "/[^p^k^'^m^n^w^l^h^a^e^i^o^u]/d" |
+
+# sorts unique words
+sorts -u
+
+In order to run this script, I ran the command 'chmod +x buildwords' in order to give myself executable rights. Then I ran the command 'cat hwnwdseng.htm | ./buildwords > hwords' in order to create a file hwords that contained all the hawaiian words.

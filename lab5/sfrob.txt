@@ -1,0 +1,114 @@
+
+Zhengfu Ding 104928991
+
+Results of comparing performance of sfrob, sfrobc, and sfrobs
+
+I created 3 input file called inputfile[123].txt that holds 100, 1000, and 10000 lines of random text. I then output it to another text file called outputfile.txt. I used these two files in conjunction with the three versions of sfrob and whichever version could run the -f option. These are the results:
+
+
+time ./sfrob < inputfile1.txt > outputfile.txt
+
+real 0m0.004s
+user 0m0.001s
+sys  0m0.001s
+
+time ./sfrob < inputfile2.txt > outputfile.txt
+
+real 0m0.011s
+user 0m0.007s
+sys  0m0.002s
+
+time ./sfrob < inputfile3.txt > outputfile.txt
+
+real 0m0.082s
+user 0m0.072s
+sys  0m0.004s
+
+time ./sfrobu < inputfile1.txt > outputfile.txt
+
+real 0m0.009s
+user 0m0.001s
+sys  0m0.006s
+
+time ./sfrobu < inputfile2.txt > outputfile.txt
+
+real 0m0.063s
+user 0m0.010s
+sys  0m0.050s
+
+time ./sfrobu < inputfile3.txt > outputfile.txt
+
+real 0m0.580s
+user 0m0.105s
+sys  0m0.456s
+
+time ./sfrobu -f < inputfile1.txt > outputfile.txt
+
+real 0m0.009s
+user 0m0.001s
+sys  0m0.007s
+
+time ./sfrobu -f < inputfile2.txt > outputfile.txt
+
+real 0m0.067s
+user 0m0.012s
+sys  0m0.050s
+
+time ./sfrobu -f < inputfile3.txt > outputfile.txt
+
+real 0m0.627s
+user 0m0.156s
+sys  0m0.452s
+
+time ./sfrobs < inputfile1.txt > outputfile.txt
+
+real 0m0.006s
+user 0m0.004s
+sys  0m0.003s
+
+time ./sfrobs < inputfile2.txt > outputfile.txt
+
+real 0m0.009s
+user 0m0.002s
+sys  0m0.008s
+
+time ./sfrobs < inputfile3.txt > outputfile.txt
+
+real 0m0.036s
+user 0m0.023s
+sys  0m0.012s
+
+time ./sfrobs -f < inputfile1.txt > outputfile.txt
+
+real 0m0.006s
+user 0m0.002s
+sys  0m0.005s
+
+time ./sfrobs -f < inputfile2.txt > outputfile.txt
+
+real 0m0.010s
+user 0m0.007s
+sys  0m0.003s
+
+time ./sfrobs -f < inputfile3.txt > outputfile.txt
+
+real 0m0.047s
+user 0m0.039s
+sys  0m0.007s
+
+Our experiment shows that the sfrobu program is the worst at performing its task in an efficient manner. Now between sfrob and sfrobs, for smaller elements such as around 100 lines, sfrob does a faster job than sfrobs. However, as we enter more and more lines, as the number approaches more and more orders of magnitude, sfrobs is significantly faster than both sfrob and sfrobu. 
+
+When we add the -f option to each program, it increases the time by a little amount at first, but the time increases as the order of magnitude increases.
+
+Analyzing each program, sfrobs was the fastest as more and more elements/lines are added. Then, the sfrob program was the next best solution. This makes sense because it is buffered, so system calls are less frequent because it spends less time in kernel mode. However, sfrobu was the worst solution because it is unbuffered. Thus, it switches to kernel mode too often, thus increasing time and system calls.
+
+sfrobu
+Estimating the number of comparisons as a function of the number of input lines:
+Lines | comparisons
+10^2  | 691
+10^3  | 10216
+10^4  | 133207
+
+The relationship looks to be logarithmic
+My best estimate for this relationship is:
+Comparisons = lines * log(lines)

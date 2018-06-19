@@ -1,0 +1,73 @@
+Zhengfu Ding
+104928991
+CS35L 
+Lab 5
+
+The first thing I did was write a C transliteration program tr2b.c that uses getchar and putchar to transliterate bytes using a buffered I/O. The implementation's main program took two operand (from and to) that are byte strings of the same length, and that copies stdin to stdout, transliterating every byte in (from) to the corresponding byte in (to). My program also reports an error if (from) and (to( are not the same length or if (from) has duplicate bytes. 
+
+Then, I created another C transliteration program tr2u.c which has the same functionality as tr2b.c, except it is unbuffered and uses direct system calls read and write.
+
+Afterwards, I throughly tested both programs 'tr2b.c' and 'tr2u.c' with the following example test:
+
+echo "suh dude" | ./tr2b 'bruh'
+echo "suh dude" | ./tr2b 'bruh' 'far'
+echo "suh dude" | ./tr2b 'bruh' 'farms'
+echo "suh dude" | ./tr2b 'bruh' 'farm'
+
+echo "suh dude" | ./tr2u 'bruh'
+echo "suh dude" | ./tr2u 'bruh' 'far'
+echo "suh dude" | ./tr2u 'bruh' 'farms'
+echo "suh dude" | ./tr2u 'bruh' 'farm'
+
+The first three tests in both cases produced error messages while the last test in both cases produced 'srm dude', which was desired.
+
+Now, I want to create a big text file of 5,000,000 random bytes to use for testing, Using the command 'cat /dev/urandom | head -c 5000000 > bigtextfile.txt'. Then, i use the 'strace' command to compare system calls issued by tr2b and tr2u when copying one file to another using the following commands:
+
+strace -o straceB ./tr2b abc def < bigtextfile.txt > tr2bcopy.txt
+strace -o straceU ./tr2u abc def < bigtextfile.txt > tr2ucopy.txt
+
+Then, I used the 'wc' command to see how many system calls were written in the stract output file using the following commands:
+
+cat straceB | wc -l
+cat straceU | wc -l
+
+The buffered tr2b command used 31 systems calls.
+The unbuffered tr2u command took too long to finish, but it had 3938319 system calls when I ended it.
+
+I repeated the same process, however, instead of copying one file to another, I copied a file to my terminal using the following commands:
+
+strace -o straceBTerminal ./tr2b abc def < bigtextfile.txt
+strace -o straceUTerminal ./tr2u abc def < bigtextfile.txt
+cat straceBTerminal | wc -l
+cat straceUTerminal | wc -l
+
+The buffered tr2b command used 34 system calls.
+The unbuffered tr2u command took too long to finish, but it had 239069 system calls when I ended it
+
+Now, I used the 'time' command to measure how much faster one program is, compared to the other, when copying the same amount of data.
+
+time ./tr2b abc def < bigtextfile.txt > tr2bcopytime.txt
+
+real 0m0.003s
+user 0m0.000s
+sys  0m0.001s
+
+time ./tr2u abc def < bigtextfile.txt >	tr2ucopytime.txt
+
+real 0m10.106s
+user 0m1.449s
+sys  0m8.613s
+
+time ./tr2b abc def < bigtextfile.txt
+
+real 0m0.002s
+user 0m0.000s
+sys  0m0.001s
+
+time ./tr2u abc def < bigtextfile.txt
+
+real 0m10.093s
+user 0m1.411s
+sys  0m8.587s
+
+Based on our experiment, we can conclude that the buffered version is much much faster than the unbuffered version when translating large files. This is due to the extra overhead required when unbuffered. 

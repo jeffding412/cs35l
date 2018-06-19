@@ -1,0 +1,7 @@
+1. The patch improves the performance of the 'ls' command because the only thing that is being changed by the patch is the removal of a if-statement and having it replaced by what the if-statement contained anyways. Therefore, there will be fewer assembly instructions, thus improving the performance of the code.
+
+2. The patch changes all listed files and directories into non-colored identifiers. The default command highlights folders, files, and executables in different colors. This is something that a company might want to watch out for because it might confuse or disorganize the projects the company is working on.
+
+3. When I ran this script on an empty file like /dev/null, I get the output 'IndexError: list index out of range'. The reason why this happens is because the script raises IndexError if seq is empty.
+
+4. If this script is invoked using Python3 instead of Python2, the script outputs 'SyntaxError: invalid syntax'. The reason why this happens is because the Python 3 changed the automatic tuple unpacking of IOError and merged the parameters in OSError.

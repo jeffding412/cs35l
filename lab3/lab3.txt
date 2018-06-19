@@ -1,0 +1,21 @@
+
+The first thing I did was download coreutils-8.29.tar.xz to my home directory using the command 'wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-8.29.tar.xz'
+Then I downloaded the signature and the GNU keyring using the commands 'wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-8.29.tar.xz.sig' and 'wget https://ftp.gnu.org/gnu/gnu-keyring.gpg'
+
+Then I untared and unzipped the file using the command 'tar -xJvf coreutils-8.29.tar.xz'
+
+Afterwards, I verified its signature and GNU keyring by running the shell command 'gpg --verify --keyring ./gnu-keyring.gpg coreutils-8.29.tar.xz.sig'
+
+Then, I created a directory called coreutilsInstall using the command 'mkdir coreutilsInstall'. I will be installing coreutils into this directory.
+
+I then installed the coreutils into my coreutilsInstall directory using the command './configure --prefix=/u/cs/ugrad/zhengfu/coreutilsInstall/'
+
+Then, I compiled the file using the 'make' command and installed it using the 'make install' command.
+
+Then came reproducing the bug. I navigated into the coreutilsInstall directory and ran the command 'ls -a -A'. This produced an output '.  ..  bin  libexec  share'. This is not right because the first two outputs shouldn't be there. 
+
+I then navigated to the coreutils-8.29 diretory and created a file called 'patch_file'. I opened the file using the command 'nano patch_file' and copied and pasted the contents of the patch of Bug#30963 Message #10. 
+
+After saving and exiting, I read through the patch man pages and found that the command 'patch –pNUM < patch_file', the NUM should be 1 because we are using a patch file in the same directory. Therefore, I ran the command 'patch –p1 < patch_file'. Then, I used the 'make' command to rebuild the patched ls.c. 
+
+Finally, I tested the modified 'ls' command using the test case in the patch file, which was 'ls -aA'. The output of this removed the first two elements of '. ..' from the output, which is what I wanted because this means that -A overrides -a.

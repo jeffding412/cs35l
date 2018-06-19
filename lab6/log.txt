@@ -1,0 +1,38 @@
+Zhengfu Ding
+104928991
+
+First, I ran the command 'sort --version' to make sure I was using a new-enough version of the sort command. My sort command was version 8.22, which I think should be good enough.
+
+My next course of action was to test how well the multithreaded sort works by measuring its performance. First, I generated a file containing 10,000,000 random single-precision floating point numbers, in textual form, one per line with no white spaces by running the command 'cat /dev/urandom | od -f -An | tr -s ' ' '\n' | head -n 10000000 > bigtext.txt'
+
+Now then I have my test data in a file, I used the command 'time -p sort -g bigtext.txt > /dev/null' to time the sort command. The following results were outputted:
+
+real 22.58
+user 122.23
+sys 0.48
+
+From the following results, I noticed that the user time took nearly six times longer than the real time. 
+
+I then invoked sort with the --parallel option as well as the -g option, and ran my benchmark with 1, 2, 4, and 8 hreads, in each case recording the real, user, and system time. Here are the following inputs and outputs:
+
+'time -p sort -g --parallel=1 bigtext.txt > /dev/null'
+real 106.48
+user 106.27
+sys 0.19
+
+'time -p sort -g --parallel=2 bigtext.txt > /dev/null'
+real 56.78
+user 107.91
+sys 0.28
+
+'time -p sort -g --parallel=4 bigtext.txt > /dev/null'
+real 33.13
+user 111.42
+sys 0.38
+
+'time -p sort -g --parallel=8 bigtext.txt > /dev/null'
+real 22.80
+user 124.10
+sys 0.49
+
+As my experiment shows, the more parallel threads are used in sorting the file, the user time increases very slightly, however, the real time decreases dramatically. In fact, the time recorded using 8 parallel threads is nearly equal to the default sort without specifying parallel threads. This probably means that the default sort uses 8 parallel threads anyway. 

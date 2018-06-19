@@ -1,0 +1,53 @@
+1. man -k specificWord 
+Answer found by reading throuh using man man
+
+2. cp: /usr/bin/cp wc: /usr/bin/wc
+Answer found using the which <command> command
+
+3. X: starts X server
+   w: Show who is logged on and what they are doing
+   [: Returns boolean condition
+Answers found using find /usr/bin -name "?" command and man pages
+
+4. /etc/alternatives/emacs
+Answer found using cd /usr/bin and  ls -l emacs commands
+
+5. /usr/bin/emacs version: 23.1.1 |  plain Emacs: 24.3.1 
+   They are different because the /usr/bin/emacs program is a more stable version of emacs
+Answer found using emacs and using M-x emacs-version command
+
+6. g+s sets group permission of the executable the same as the owners upon execution. o-x removes others' permission to execute the file.
+Answer found using notes taken from Lab hours. 
+
+7. find /usr/local/cs -ctime -30 -type d
+Answer found using man find page. -ctime -30 -type d will search for directories that have been modified in the last 30 days located under or in the targeted directory.
+
+8. 359 are symbolic links.
+Answer found by cd into the result of the which find command. Then, running the find . -type l | wc -l command to determine the number of symbolic links in the current directory.
+
+9. The oldest file is libxkbfile.so.1.0.2 file.
+Answer found by cd into /usr/lib64 and running the ls -lt command to order the files by time.
+
+10. When invoked without arguments, locale summarizes the current locale environment for each locale category defined by the LC_* environment variables.
+Anser found by reading the man locale page
+
+11. dired-downcase, downcase-region, and downcase-word
+Answer found by calling emacs and using C-h a command. Then, typed in downcase to search for the keyword (downcase)
+
+12. C-M-r: Do incremental search backwards for regular expression 
+    C-M-s: Do incremental search forward for regular expression 
+    C-M-t: Like M-t but applies to sexps
+    C-M-u: Move backward out of one level of parentheses
+    C-M-v: Scroll next window upward ARG lines or near full screen if no ARG
+Answers found by using C-h b to pull up buffer and switching to it using C-x o. Then, run a search C-s C-M-r in order to find the commands.
+
+13. Signal a 'quit' condition.
+    During execution of Lisp code, this character causes a quit directly.
+    At top-level, as an editor command, this simply beeps.
+Answer found using same method as 12, but running a C-s C-g command
+
+14. Pastes whatever is on the emacs clipboard. You can easily invoke it using C-y
+Answer found using same method as 12 and 13, but running a C-s yank commmand
+
+15. dired in Emacs prints the current and parent directory in the long format while ls -l doesn't
+Answer found using same method as 12, 13, and 14, but running a C-s dired command

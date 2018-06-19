@@ -1,0 +1,64 @@
+#! /bin/bash
+
+# input directory that will have duplicate files removed
+dir = $1
+
+# holds most files in dir 
+regularFiles=`ls -a $dir | sort`
+# holds files in dir that begin with '.'
+dotFiles=`ls -a1 $dir | grep '^\.' | sort`
+
+# declare array to hold sorted files and an iterator
+let count=0;
+declare -a sortedFiles
+
+# change internal field separator (IFS) to new line
+IFS=$'\n'
+
+# sort dotFiles first
+for file in $dotFiles
+do
+    # if file is unreadable, throw error
+    if [ ! -r "$dir/$file" ]
+    then
+    echo "Error: $dir/$file unreadable"
+    # if file is readable, not symbolic, and is a file, add to sortedFiles array
+    elif [ ! -L "$dir/$file" ] && [ -f "$dir/$file" ];
+    then
+    sortedFiles[$count]="$dir/$file"
+    let count=count+1
+    fi
+done
+
+# do the thing with regular files
+for file in $regFiles
+do
+    # if file is unreadable, throw error
+    if [ ! -r "$dir/$file" ]
+    then
+        echo "Error: $dir/$file unreadable"
+    # if file is readable, not symbolic, and is a file, add to sorted_files
+    elif [ ! -L "$dir/$file" ] && [ -f "$dir/$file" ];
+    then
+        sortedFiles[$count]="$dir/$file"
+        let count=count+1
+    fi
+done
+
+# iterate through sorted files
+for (( i=0; i<$count; i++ ))
+do
+    # iterate through unsorted files and search for a duplicate
+    for (( j=i+1; j<$count; j++ ))
+    do
+	# compare the files
+        cmp -s "${sortedFiles[$i]}" "${sortedFiles[$j]}"
+        # if files are duplicates (cmp returns 0)
+	if [ $? -eq 0 ]
+        then
+	    # replace duplicate with a hard link to the the first original
+            ln -fP "${sortedFiles[$i]}" "${sortedFiles[$j]}"
+	    sortedFiles[$j]=sortedFiles[$i]
+        fi
+    done
+done

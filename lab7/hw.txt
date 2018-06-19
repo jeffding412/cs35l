@@ -1,0 +1,5 @@
+Zhengfu Ding 104928991
+
+1. Assuming the other teams really had been observing all the bytes going across the network. My resulting network is still secure because the data is encrypted and I still have control of the private key to decrypt it. However, this would change if (1) I assumed that the other teams had also tapped my keyboards after I completed all client-server set up and had thereby obtained my team's keystrokes during later operation, then the network may not be secure because the other teams may have our private key and (2) I booted off USB and the other teams temporaily had physical control of the USB, the network would not be secure becuase they would gain access to my .ssh folder, thus having access to public and private keys, allowing them to decrypt messages across my network.
+
+2. The "gpg2 --verify" command doesn't verify that I personally created the file in question because the command compares the signatured decrypted to the decrypted data using a public key. This can be a problem because the file can be intercepted and changed. In order to fix this problem is to use a third-party that keeps a record of the file and its origin.

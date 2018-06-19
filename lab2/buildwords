@@ -1,0 +1,34 @@
+#! /bin/sh
+
+# removes everything except words between <td> and </td>
+sed -n '/<td>/,/<\/td>/p' $1 |
+
+# removes new lines
+tr -d '\n' |
+
+# replaces ` with '
+sed s/\`/\'/g |
+
+# replaces </td> with new lines
+sed -r 's/<\/td>/\n/g' |
+
+# removes all tags
+sed -r 's/<[^>]*>//g' |
+
+# removes English words( which are every other word)
+sed -n '2~2p' |
+
+# replaces commas and spaces with new lines
+sed -r 's/[, ]/\n/g' |
+
+# removes empty lines
+sed -r '/^\s*$/d' |
+
+# changes uppercase letters to lowercase letters
+tr '[:upper:]' '[:lower:]' |
+
+# removes words that don't have Hawaiian letters
+sed  "/[^p^k^'^m^n^w^l^h^a^e^i^o^u]/d" |
+
+# sorts unique words
+sorts -u

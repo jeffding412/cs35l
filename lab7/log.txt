@@ -1,0 +1,10 @@
+Zhengfu Ding 104928991
+Partner: Ben Limpanukorn
+
+I first set up the BeagleBone by following the instruction on the Piazza. The rough summary of the steps were bascially to: connect BeagleBone to computer using a USB cable, finding and opening the BEAGLEBONE external storage device, opening the "START.htm" file and installing the proper drivers, then running "sudo ssh root@192.168.7.2" to SSH into the BeagleBone, and then connecting the BeagleBone to the wifi. Then, I updated the database of apt-get and installed xauth and xvfb for X11 and downloaded firefox.
+
+We started the lab by me acting as a client while Ben acted as the server. First, I generated public and private keys using the command "ssh-keygen". Then, I copied my public key to his server for key based authentication using the command "ssh-copy-id -i jeff@192.168.8.1". Then, I added my private key to the authentication agent "ssh-add". Then I SSH into Ben's server "ssh -X jeff@192.168.8.1". Then I opened firefox with the command "firefox"
+
+Afterwards, we did the same thing but I acted as a server and Ben became the client. First, I generated a public and private key with the command "ssh-keygen". Then, I created an account for the client, which is Ben, "sudo useradd -d /home/ben -m ben" and "sudo passwd ben". Then, I created an .ssh directory for Ben with "cd /home/ben" and "sudo mkdir .ssh". Then, I changed onwership and permission on the .ssh directory to Ben "sudo chown -R ben .ssh" "sudo chmod 700 .ssh"
+
+Ben then SSH into my BeagleBone and opened firefox with no problem.

@@ -1,0 +1,74 @@
+
+First, I downloaded the coreutils with a bug file using the command 'wget https://web.cs.ucla.edu/classes/spring18/cs35L/assign/coreutils-with-bug.tar.gz'. Then, I untared using the command 'tar -xzf coreutils-with-bug.tar.gz'. Then, I navigated into that folder and read through the INSTALL file. Using that knowledge, I configured coreutils using the './configure' command and compiled it using the 'make' command. 
+
+Unfortunately, compilation failed and the following two bugs shows up:
+
+In file included from utimecmp.c:41:0:
+utimens.h:2:5: error: conflicting types for 'futimens'
+ int futimens (int, char const *, struct timespec const [2]);
+     ^
+In file included from utimecmp.h:25:0,
+                 from utimecmp.c:25:
+/usr/include/sys/stat.h:373:12: note: previous declaration of 'futimens' was here
+ extern int futimens (int __fd, const struct timespec __times[2]) __THROW;
+            ^
+ 
+In order to rectify this, I applied the patch. First, I grabbed the patch using the command 'wget https://web.cs.ucla.edu/classes/spring18/cs35L/assign/coreutils.diff'. Then, I opened the coreutils.diff file using the emacs and removed all ~ in the file.
+
+After editting the file, I applied the patch using the command 'patch -p0 < coreutils.diff'. Afterwards, I compiled the program again using the 'make' command and no errors occured. 
+
+This error originally occured because the futimens functions had different parameters. The fix changes the function name to 'coreutils_futimens' and makes it take in three parameters.
+
+Now, I attempted to reproduce the desired problem. I ran the following lines of commands:
+
+tmp=$(mktemp -d)
+cd $tmp
+touch -d '1918-11-11 11:00 GMT' wwi-armistice
+ls -lt --full-time wwi-armistice now now1
+touch now
+sleep 1
+touch now1
+ls -lt wwi-armistice now now1
+-rw-r--r-- 1 zhengfu csugrad 0 Nov 11  1918 wwi-armistice
+-rw-r--r-- 1 zhengfu csugrad 0 May  2 15:53 now1
+-rw-r--r-- 1 zhengfu csugrad 0 May  2 15:53 now
+
+Right here, the bug is that wwi-armistice is in the wrong place. It should be the 3rd element, but it is listed as the most recent element. 
+
+In order to figure out what is wrong, I used the gdb debugger to see where the program is breaking. I ran the command 'gdb ~/coreutils-with-bug/src/ls'
+
+In the debugger, I ran the command 'info functions', which showed a list of functions in the src folder. I decided that the compare_mtime function looked like the most important function for this bug.
+
+I set a breakpoint at the function using the command 'break compare_mtime'. I then ran the program using the command 'run -lt wwi-armistice now now1'. At the breakpoint, I enter the 'si' command and then the 'list' command. What appeared was the following:
+
+45    static inline int
+46    timespec_cmp (struct timespec a, struct timespec b)
+47    {
+48      int diff = a.tv_sec - b.tv_sec;
+49	return diff ? diff : a.tv_nsec - b.tv_nsec;
+50    }
+
+Now I see the source of the bug: when diff is calculate by the difference between a.tv._sec and b.tv_sec, there is a chance of integer overflow if a.tc_sec is so small that it wraps around and becomes extremely big. 
+
+Now that I know where the issue is, I used the 'cp coreutils-with-bug/lib/timespec.h timespec.h' command to copy the timespec.h file. Then, I opened it in emacs and fixed the bug.
+
+I then used the 'diff -u coreutils-with-bug/lib/timespec.h timespec.h > coreutils-with-bug/lab4.diff' command to produce a new patch file that shows the difference. I then ran the patch using the 'patch -p0 < lab4.diff' command and specified the path to lib/timespec.h. After making the file and reproducing the bug, the following output was created:
+
+-rw-r--r-- 1 zhengfu csugrad 0 May  2 15:53 now1
+-rw-r--r-- 1 zhengfu csugrad 0 May  2 15:53 now
+-rw-r--r-- 1 zhengfu csugrad 0 Nov 11  1918 wwi-armistice
+
+This is what it should be so the patch worked.
+
+Running the same reproduction on the SEASnet server:
+
+touch -d '1918-11-11 11:00 GMT' wwi-armistice
+touch now
+sleep 1
+touch now1
+ls -lt  wwi-armistice now now1
+-rw-r--r-- 1 zhengfu csugrad 0 Dec 17  2054 wwi-armistice
+-rw-r--r-- 1 zhengfu csugrad 0 May  2 16:55 now1
+-rw-r--r-- 1 zhengfu csugrad 0 May  2 16:55 now
+
+From the SEASnet server, we see that the oldest file is actually the most recent file because it is from the future (idk aliens probably). This is because the SEASnet servers use a signed 32-bit time system so the year 1918 gets represented as the year 2054 and a whole slew of other nooks and cranies. 

@@ -1,0 +1,33 @@
+Zhengfu Ding 104928991
+
+First, I checked out version 3.0 of Diffutils from my repository into a new branch named "quote" 'git checkout v3.0 -b quote'
+
+I then installed my changes into this new branch by running the patch command with my patch quote-3.0-patch.txt as input 'patch -p1 < quote-3.0-patch.txt'
+
+patching file src/cmp.c
+patching file src/diff.c
+patching file src/diff3.c
+patching file src/dir.c
+patching file src/sdiff.c
+patching file src/util.c
+
+After learning the Emacs function add-change-log-entry-other-window (C-x 4 a), I used this function to compose an appropriate ChangeLog entry as the commit message by opening all six files and using the command.
+
+Then, I used the command 'git add .' to add the commit to be staged. Then, I committed my changes to the new branch using the ChangeLog entry as the commit message 'git commit -F ChangeLog'
+
+I then used the command 'git format-patch' to generate a file formatted-patch.txt 'git format-patch -1 --stdout > formatted-patch.txt'
+
+For merging, I used my partner Tony Hu's patch which he sent and I renamed it to formatted-patch-huistony.txt. I first checked out version 3.0 again into a new temporary branch partner 'git checkout v3.0 -b partner', then I applied the patch with the command 'git am ../formatted-patch-huistony.txt', and then I built the resulting system, checking that it works with the following commands:
+
+./bootstrap
+./configure
+make
+make check
+diff . -
+diff --help
+
+The patch works
+
+I then verified that my ChangeLog entry works by running the command 'make distdir' and inspected the resulting diffutils*/ChangeLog file.
+
+Finally, knowing that there is a copy of the GNU Means git repository's master branch on SEASnet in the directory ~eggert/src/gnu/emacs, I navigated to the directory after ssh with the -Y option and ran 'gitk' in the directory. I found the newest merge that is not newer than 2015-01-25 is on made by Joakim Verona (Merge branch 'master' into xwidget) ID: d522fd8ca73e668bfafd0419bc5f71f2751cca24. I took a screenshot gitk-screenshot.png of my view of the mergepoint and created an ASCII text file gitk-description.txt that briefly describes the roles of sub windows that I see in the screenshot.
