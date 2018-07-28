@@ -3,12 +3,12 @@ These are my solutions to all UCLA CS35L Assignments from Spring of 2018. The RE
 
 | Assignment | Score |
 | ------- | ----- |
-| 1 | 94.5/100  |
-| 2 | 32.5/100  |
-| 3 | 43/100  |
-| 4 | 94/100  |
-| 5 | 85/100  |
-| 6 | 100/100  |
-| 7 | 54/100  |
-| 8 | 100/100 |
-| 9 | 86/100 |
+| 1 (Emacs/Linux) | 94.5/100  |
+| 2 (Shell Scripting) | 32.5/100  |
+| 3 (Python) | 43/100  |
+| 4 (C Debugging) | 94/100  |
+| 5 (System Calls) | 85/100  |
+| 6 (Multithreading) | 100/100  |
+| 7 (SSH) | 54/100  |
+| 8 (Dynamic Linking) | 100/100 |
+| 9 (Git) | 86/100 |
